@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蝦皮賣家利潤計算機</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f7ff;
+        }
+        .blue-gradient {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+        .red-gradient {
+            background: linear-gradient(135deg, #b91c1c 0%, #ef4444 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-blue-100">
+        <!-- Header -->
+        <div class="blue-gradient p-8 text-white text-center">
+            <h1 class="text-2xl font-bold mb-2">蝦皮利潤計算機</h1>
+            <p class="text-blue-100 text-sm opacity-90">避免忙碌一場卻賠錢，精準算出你的每一分利潤</p>
+        </div>
+
+        <!-- Main Form -->
+        <div class="p-8 space-y-5">
+            <!-- Inputs -->
+            <div class="grid grid-cols-1 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fa-solid fa-percent mr-1 text-blue-500 w-5"></i> 平台抽成 (%)
+                    </label>
+                    <input type="number" id="commission" value="7.5" step="0.1"
+                        class="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-blue-900"
+                        placeholder="手續費 + 服務費">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fa-solid fa-tag mr-1 text-blue-500 w-5"></i> 商品進價 (TWD)
+                    </label>
+                    <input type="number" id="cost" value="100"
+                        class="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-blue-900"
+                        placeholder="商品採購成本">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fa-solid fa-truck-ramp-box mr-1 text-blue-500 w-5"></i> 運費雜項 (TWD)
+                    </label>
+                    <input type="number" id="misc" value="15"
+                        class="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-blue-900"
+                        placeholder="包材、運費分攤等">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <i class="fa-solid fa-cart-shopping mr-1 text-blue-500 w-5"></i> 預計售價 (TWD)
+                    </label>
+                    <input type="number" id="price" value="250"
+                        class="w-full px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all font-medium text-blue-900"
+                        placeholder="前端標示售價">
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="relative py-2">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-100"></div></div>
+                <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-gray-400 font-bold">計算結果分析</span></div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col justify-center">
+                    <p class="text-xs text-gray-500 mb-1">損益兩平標價</p>
+                    <p class="text-lg font-bold text-gray-800">$ <span id="break-even">0</span></p>
+                    <p class="text-[10px] text-gray-400 mt-1">*標價低於此即虧損</p>
+                </div>
+                <div id="profit-card" class="blue-gradient p-4 rounded-2xl text-white shadow-lg transition-colors duration-300">
+                    <p class="text-xs opacity-80 mb-1">預估純利</p>
+                    <p class="text-xl font-bold">$ <span id="profit">0</span></p>
+                    <p class="text-[10px] opacity-70 mt-1">純利率: <span id="margin">0</span>%</p>
+                </div>
+            </div>
+
+            <!-- Hidden Details -->
+            <div class="bg-blue-50/50 p-4 rounded-xl text-xs text-blue-800 space-y-1 border border-blue-100">
+                <div class="flex justify-between">
+                    <span>金流服務費 (固定)</span>
+                    <span class="font-medium">2%</span>
+                </div>
+                <div class="flex justify-between border-t border-blue-100 pt-1 mt-1 font-bold">
+                    <span>系統撥款金額 (不含雜項)</span>
+                    <span id="payout">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-4 text-center bg-gray-50 border-t border-gray-100">
+            <p class="text-[10px] text-gray-400">數據僅供參考，實際請以蝦皮賣家中心撥款為準</p>
+        </div>
+    </div>
+
+    <script>
+        const inputCommission = document.getElementById('commission');
+        const inputCost = document.getElementById('cost');
+        const inputMisc = document.getElementById('misc');
+        const inputPrice = document.getElementById('price');
+        
+        const outputBreakEven = document.getElementById('break-even');
+        const outputProfit = document.getElementById('profit');
+        const outputMargin = document.getElementById('margin');
+        const outputPayout = document.getElementById('payout');
+        const profitCard = document.getElementById('profit-card');
+
+        function calculate() {
+            // 固定參數
+            const paymentFeePercent = 2; // 蝦皮金流費
+
+            const commissionPercent = parseFloat(inputCommission.value) || 0;
+            const cost = parseFloat(inputCost.value) || 0;
+            const misc = parseFloat(inputMisc.value) || 0;
+            const price = parseFloat(inputPrice.value) || 0;
+
+            const totalFeePercent = (commissionPercent + paymentFeePercent) / 100;
+
+            // 1. 損益兩平計算公式: (進價 + 雜項) / (1 - 總抽成率)
+            const breakEvenPoint = (cost + misc) / (1 - totalFeePercent);
+
+            // 2. 撥款金額 = 售價 * (1 - 總抽成率)
+            const payout = price * (1 - totalFeePercent);
+
+            // 3. 純利 = 撥款 - 進價 - 雜項
+            const netProfit = payout - cost - misc;
+
+            // 4. 純利率 = 純利 / 售價
+            const margin = price > 0 ? (netProfit / price) * 100 : 0;
+
+            // 顯示結果
+            outputBreakEven.textContent = Math.ceil(breakEvenPoint).toLocaleString();
+            outputProfit.textContent = Math.floor(netProfit).toLocaleString();
+            outputMargin.textContent = margin.toFixed(1);
+            outputPayout.textContent = '$' + Math.floor(payout).toLocaleString();
+
+            // 顏色警示
+            if (netProfit < 0) {
+                profitCard.classList.remove('blue-gradient');
+                profitCard.classList.add('red-gradient');
+            } else {
+                profitCard.classList.add('blue-gradient');
+                profitCard.classList.remove('red-gradient');
+            }
+        }
+
+        // 監聽所有輸入
+        [inputCommission, inputCost, inputMisc, inputPrice].forEach(el => {
+            el.addEventListener('input', calculate);
+        });
+
+        // 初始執行一次
+        calculate();
+    </script>
+</body>
+</html>
